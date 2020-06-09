@@ -31,6 +31,7 @@
 #include "lcd/lcd_mem_rgb565.h"
 #include "lcd/lcd_mem_bgra8888.h"
 #include "lcd/lcd_mem_rgba8888.h"
+#include "lcd/lcd_mono.h"
 
 #ifndef WITH_LINUX_DRM
 
@@ -50,6 +51,33 @@ static void on_app_exit(void) {
   fb_close(fb);
 
   log_debug("on_app_exit\n");
+}
+
+/*
+ * write by qianfan zhao
+ */
+static ret_t lcd_mono_flush(lcd_t *lcd)
+{
+  lcd_mono_t* mono = (lcd_mono_t*)(lcd);
+  fb_info_t *fb = (fb_info_t *)(mono->ctx);
+  rect_t* dr = &(lcd->dirty_rect);
+  rect_t* fps_r = &(lcd->fps_rect);
+
+  if ((dr->w > 0 && dr->h > 0) || (fps_r->w > 0 && fps_r->h > 0)) {
+    for (wh_t j = 0; j < lcd->h; j++) {
+      for (wh_t i = 0; i < lcd->w; i++) {
+        bool_t pixel = bitmap_mono_get_pixel(mono->data, lcd->w, lcd->h, i, j);
+        uint8_t *p = fb->fbmem0 + j * lcd->w + i;
+        if (pixel) {
+          *p = 0;
+        } else {
+          *p = 0xff;
+        }
+      }
+    }
+  }
+
+  return RET_OK;
 }
 
 static void* display_thread(void* ctx) {
@@ -133,6 +161,8 @@ static lcd_t* lcd_linux_create_flushable(fb_info_t* fb) {
     }
   } else if (bpp == 24) {
     assert(!"not supported framebuffer format.");
+  } else if (bpp == 8) {
+    lcd = lcd_mono_create(w, h, lcd_mono_flush, NULL, fb);
   } else {
     assert(!"not supported framebuffer format.");
   }

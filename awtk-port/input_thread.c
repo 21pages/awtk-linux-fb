@@ -131,7 +131,7 @@ static const int32_t s_key_map[0x100] = {[KEY_1] = TK_KEY_1,
                                          [KEY_EQUAL] = TK_KEY_EQUAL,
                                          [KEY_BACKSPACE] = TK_KEY_BACKSPACE,
                                          [KEY_TAB] = TK_KEY_TAB,
-                                         [KEY_ESC] = TK_KEY_ESCAPE};
+                                         [KEY_ESC] = TK_KEY_RETURN};
 
 static int32_t map_key(uint8_t code) {
   return s_key_map[code];

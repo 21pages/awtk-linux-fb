@@ -46,7 +46,7 @@
 #endif /*TS_DEVICE_FILENAME*/
 
 #ifndef KB_DEVICE_FILENAME
-#define KB_DEVICE_FILENAME "/dev/input/event1"
+#define KB_DEVICE_FILENAME "/dev/input/event3"
 #endif /*KB_DEVICE_FILENAME*/
 
 #ifndef MICE_DEVICE_FILENAME
@@ -76,8 +76,10 @@ static tk_thread_t* s_ts_thread = NULL;
 
 static void on_app_exit(void) {
   tk_thread_destroy(s_kb_thread);
+  #if 0
   tk_thread_destroy(s_mice_thread);
   tk_thread_destroy(s_ts_thread);
+  #endif
   lcd_destroy(s_lcd);
 }
 
@@ -102,8 +104,10 @@ main_loop_t* main_loop_init(int w, int h) {
 
   s_kb_thread =
       input_thread_run(KB_DEVICE_FILENAME, input_dispatch_to_main_loop, loop, lcd->w, lcd->h);
+  #if 0
   s_mice_thread =
       mouse_thread_run(MICE_DEVICE_FILENAME, input_dispatch_to_main_loop, loop, lcd->w, lcd->h);
+  #endif
 
   s_lcd = lcd;
 
